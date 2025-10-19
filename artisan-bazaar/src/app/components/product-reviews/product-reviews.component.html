@@ -1,0 +1,133 @@
+<div class="reviews-container">
+  <h2>Avis clients</h2>
+  
+  <!-- Résumé des avis -->
+  <div class="review-summary" *ngIf="reviewSummary">
+    <div class="average-rating">{{ reviewSummary.averageRating }}</div>
+    <div class="rating-details">
+      <div class="stars">
+        <span class="star" *ngFor="let star of getStarsArray(reviewSummary.averageRating)">
+          {{ star ? '★' : '☆' }}
+        </span>
+      </div>
+      <div class="total-reviews">{{ reviewSummary.totalReviews }} avis</div>
+    </div>
+    <div class="rating-bars">
+      <div class="rating-bar">
+        <span class="rating-label">5</span>
+        <div class="rating-progress">
+          <div class="rating-progress-fill" [style.width]="getPercentage(reviewSummary.ratingDistribution.five)"></div>
+        </div>
+        <span class="rating-count">{{ reviewSummary.ratingDistribution.five }}</span>
+      </div>
+      <div class="rating-bar">
+        <span class="rating-label">4</span>
+        <div class="rating-progress">
+          <div class="rating-progress-fill" [style.width]="getPercentage(reviewSummary.ratingDistribution.four)"></div>
+        </div>
+        <span class="rating-count">{{ reviewSummary.ratingDistribution.four }}</span>
+      </div>
+      <div class="rating-bar">
+        <span class="rating-label">3</span>
+        <div class="rating-progress">
+          <div class="rating-progress-fill" [style.width]="getPercentage(reviewSummary.ratingDistribution.three)"></div>
+        </div>
+        <span class="rating-count">{{ reviewSummary.ratingDistribution.three }}</span>
+      </div>
+      <div class="rating-bar">
+        <span class="rating-label">2</span>
+        <div class="rating-progress">
+          <div class="rating-progress-fill" [style.width]="getPercentage(reviewSummary.ratingDistribution.two)"></div>
+        </div>
+        <span class="rating-count">{{ reviewSummary.ratingDistribution.two }}</span>
+      </div>
+      <div class="rating-bar">
+        <span class="rating-label">1</span>
+        <div class="rating-progress">
+          <div class="rating-progress-fill" [style.width]="getPercentage(reviewSummary.ratingDistribution.one)"></div>
+        </div>
+        <span class="rating-count">{{ reviewSummary.ratingDistribution.one }}</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Formulaire d'ajout d'avis -->
+  <div class="review-form">
+    <h3 class="form-title">Donnez votre avis</h3>
+    <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+      <div class="form-group">
+        <label class="form-label">Note</label>
+        <div class="star-rating">
+          <button type="button" class="star-btn" [class.active]="selectedRating >= 1" (click)="setRating(1)">★</button>
+          <button type="button" class="star-btn" [class.active]="selectedRating >= 2" (click)="setRating(2)">★</button>
+          <button type="button" class="star-btn" [class.active]="selectedRating >= 3" (click)="setRating(3)">★</button>
+          <button type="button" class="star-btn" [class.active]="selectedRating >= 4" (click)="setRating(4)">★</button>
+          <button type="button" class="star-btn" [class.active]="selectedRating >= 5" (click)="setRating(5)">★</button>
+        </div>
+        <div *ngIf="reviewForm.get('rating').touched && reviewForm.get('rating').errors?.['required']" class="invalid-feedback">
+          Veuillez sélectionner une note
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="comment">Commentaire</label>
+        <textarea id="comment" class="form-control" formControlName="comment" rows="4" placeholder="Partagez votre expérience avec ce produit..."></textarea>
+        <div *ngIf="reviewForm.get('comment').touched && reviewForm.get('comment').errors?.['required']" class="invalid-feedback">
+          Le commentaire est requis
+        </div>
+        <div *ngIf="reviewForm.get('comment').touched && reviewForm.get('comment').errors?.['minlength']" class="invalid-feedback">
+          Le commentaire doit contenir au moins 10 caractères
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Photos (optionnel)</label>
+        <input type="file" accept="image/*" multiple (change)="onImageSelected($event)" class="form-control">
+      </div>
+      
+      <button type="submit" class="submit-btn" [disabled]="reviewForm.invalid || isSubmitting">
+        <span *ngIf="isSubmitting" class="spinner"></span>
+        {{ isSubmitting ? 'Envoi en cours...' : 'Publier mon avis' }}
+      </button>
+    </form>
+  </div>
+  
+  <!-- Liste des avis -->
+  <div class="review-list">
+    <div *ngIf="reviews.length === 0" class="no-reviews">
+      Aucun avis pour ce produit. Soyez le premier à donner votre avis !
+    </div>
+    
+    <div *ngFor="let review of reviews" class="review-item">
+      <div class="review-header">
+        <div>
+          <span class="reviewer-name">{{ review.userName }}</span>
+          <span *ngIf="review.verified" class="verified-badge">✓ Achat vérifié</span>
+        </div>
+        <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+      </div>
+      
+      <div class="review-rating">
+        <span class="star" *ngFor="let star of getStarsArray(review.rating)">
+          {{ star ? '★' : '☆' }}
+        </span>
+      </div>
+      
+      <div class="review-comment">
+        {{ review.comment }}
+      </div>
+      
+      <div *ngIf="review.images && review.images.length > 0" class="review-images">
+        <img *ngFor="let image of review.images" [src]="image" alt="Photo de l'avis" class="review-image">
+      </div>
+      
+      <div class="review-actions">
+        <button class="helpful-btn" (click)="markAsHelpful(review.id)">
+          <span>👍</span>
+          <span class="helpful-count">{{ review.helpful }}</span>
+          <span>Utile</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

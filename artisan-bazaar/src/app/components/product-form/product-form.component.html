@@ -1,0 +1,163 @@
+<div class="max-w-4xl mx-auto p-6">
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-2xl font-bold mb-6">Ajouter un nouveau produit</h2>
+    
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Colonne gauche -->
+        <div class="space-y-6">
+          <!-- Nom du produit -->
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Nom du produit *</label>
+            <input 
+              type="text" 
+              id="name" 
+              formControlName="name"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+              [ngClass]="{'border-red-500': productForm.get('name')?.invalid && productForm.get('name')?.touched}">
+            <div *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched" class="text-red-500 text-sm mt-1">
+              <span *ngIf="productForm.get('name')?.errors?.['required']">Le nom du produit est requis.</span>
+              <span *ngIf="productForm.get('name')?.errors?.['minlength']">Le nom doit contenir au moins 3 caractères.</span>
+            </div>
+          </div>
+          
+          <!-- Description -->
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700">Description *</label>
+            <textarea 
+              id="description" 
+              formControlName="description"
+              rows="4"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+              [ngClass]="{'border-red-500': productForm.get('description')?.invalid && productForm.get('description')?.touched}"></textarea>
+            <div *ngIf="productForm.get('description')?.invalid && productForm.get('description')?.touched" class="text-red-500 text-sm mt-1">
+              <span *ngIf="productForm.get('description')?.errors?.['required']">La description est requise.</span>
+              <span *ngIf="productForm.get('description')?.errors?.['minlength']">La description doit contenir au moins 20 caractères.</span>
+            </div>
+          </div>
+          
+          <!-- Catégorie -->
+          <div>
+            <label for="category" class="block text-sm font-medium text-gray-700">Catégorie *</label>
+            <select 
+              id="category" 
+              formControlName="category"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+              [ngClass]="{'border-red-500': productForm.get('category')?.invalid && productForm.get('category')?.touched}">
+              <option value="" disabled>Sélectionner une catégorie</option>
+              <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+            </select>
+            <div *ngIf="productForm.get('category')?.invalid && productForm.get('category')?.touched" class="text-red-500 text-sm mt-1">
+              <span *ngIf="productForm.get('category')?.errors?.['required']">La catégorie est requise.</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Colonne droite -->
+        <div class="space-y-6">
+          <!-- Prix -->
+          <div>
+            <label for="price" class="block text-sm font-medium text-gray-700">Prix (€) *</label>
+            <input 
+              type="number" 
+              id="price" 
+              formControlName="price"
+              step="0.01"
+              min="0.01"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+              [ngClass]="{'border-red-500': productForm.get('price')?.invalid && productForm.get('price')?.touched}">
+            <div *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched" class="text-red-500 text-sm mt-1">
+              <span *ngIf="productForm.get('price')?.errors?.['required']">Le prix est requis.</span>
+              <span *ngIf="productForm.get('price')?.errors?.['min']">Le prix doit être supérieur à 0.</span>
+            </div>
+          </div>
+          
+          <!-- Stock -->
+          <div>
+            <label for="stock" class="block text-sm font-medium text-gray-700">Stock disponible *</label>
+            <input 
+              type="number" 
+              id="stock" 
+              formControlName="stock"
+              min="0"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+              [ngClass]="{'border-red-500': productForm.get('stock')?.invalid && productForm.get('stock')?.touched}">
+            <div *ngIf="productForm.get('stock')?.invalid && productForm.get('stock')?.touched" class="text-red-500 text-sm mt-1">
+              <span *ngIf="productForm.get('stock')?.errors?.['required']">Le stock est requis.</span>
+              <span *ngIf="productForm.get('stock')?.errors?.['min']">Le stock ne peut pas être négatif.</span>
+            </div>
+          </div>
+          
+          <!-- SKU -->
+          <div>
+            <label for="sku" class="block text-sm font-medium text-gray-700">SKU (Référence)</label>
+            <input 
+              type="text" 
+              id="sku" 
+              formControlName="sku"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+              [ngClass]="{'border-red-500': productForm.get('sku')?.invalid && productForm.get('sku')?.touched}">
+            <div *ngIf="productForm.get('sku')?.invalid && productForm.get('sku')?.touched" class="text-red-500 text-sm mt-1">
+              <span *ngIf="productForm.get('sku')?.errors?.['pattern']">Le SKU ne doit contenir que des lettres, chiffres, tirets et underscores.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Image upload -->
+      <div class="mt-6">
+        <label class="block text-sm font-medium text-gray-700">Image du produit</label>
+        <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+          <div class="space-y-1 text-center">
+            <div *ngIf="!imagePreview" class="flex flex-col items-center">
+              <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <p class="text-sm text-gray-600">
+                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
+                  <span>Télécharger une image</span>
+                  <input id="file-upload" name="file-upload" type="file" class="sr-only" (change)="onImageSelected($event)" accept="image/*">
+                </label>
+              </p>
+              <p class="text-xs text-gray-500">PNG, JPG, GIF jusqu'à 5MB</p>
+            </div>
+            <div *ngIf="imagePreview" class="relative">
+              <img [src]="imagePreview" alt="Aperçu du produit" class="mx-auto h-40 object-contain">
+              <button 
+                type="button" 
+                class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                (click)="imagePreview = null">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Boutons d'action -->
+      <div class="mt-8 flex justify-end space-x-3">
+        <button 
+          type="button" 
+          class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          routerLink="/admin/products">
+          Annuler
+        </button>
+        <button 
+          type="submit" 
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">Enregistrer le produit</span>
+          <span *ngIf="isSubmitting" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Enregistrement...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

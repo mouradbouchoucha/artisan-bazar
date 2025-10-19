@@ -1,0 +1,245 @@
+<div class="order-detail-container" *ngIf="!isLoading; else loadingTemplate">
+  <div *ngIf="order; else notFound">
+    <div class="order-header">
+      <div>
+        <h1 class="order-title">Détails de la commande</h1>
+        <p class="order-id">Commande #{{ order.id }}</p>
+        <p class="order-date">Passée le {{ formatDate(order.orderDate) }}</p>
+      </div>
+      <div>
+        <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+          {{ order.status }}
+        </span>
+      </div>
+    </div>
+
+    <div class="order-grid">
+      <!-- Informations de livraison -->
+      <div class="order-section">
+        <h2 class="section-title">Informations de livraison</h2>
+        <div class="address-box">
+          <p class="address-title">Adresse de livraison</p>
+          <p class="address-line">{{ order.shippingAddress.fullName }}</p>
+          <p class="address-line">{{ order.shippingAddress.street }}</p>
+          <p class="address-line">{{ order.shippingAddress.postalCode }} {{ order.shippingAddress.city }}</p>
+          <p class="address-line">{{ order.shippingAddress.country }}</p>
+          <p class="address-line">{{ order.shippingAddress.phone }}</p>
+        </div>
+      </div>
+
+      <!-- Informations de paiement -->
+      <div class="order-section">
+        <h2 class="section-title">Informations de paiement</h2>
+        <div class="address-box">
+          <p class="address-title">Adresse de facturation</p>
+          <p class="address-line">{{ order.billingAddress.fullName }}</p>
+          <p class="address-line">{{ order.billingAddress.street }}</p>
+          <p class="address-line">{{ order.billingAddress.postalCode }} {{ order.billingAddress.city }}</p>
+          <p class="address-line">{{ order.billingAddress.country }}</p>
+        </div>
+        <div class="summary-row" style="margin-top: 1rem;">
+          <span>Méthode de paiement:</span>
+          <span>{{ order.paymentMethod.type }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles commandés -->
+    <div class="order-section">
+      <h2 class="section-title">Articles commandés</h2>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Prix unitaire</th>
+            <th>Quantité</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of order.items">
+            <td>
+              <div class="product-cell">
+                <img *ngIf="item.product.imageUrl" [src]="item.product.imageUrl" alt="{{ item.product.name }}" class="product-image">
+                <div>
+                  <div class="product-name">{{ item.product.name }}</div>
+                  <div class="product-artisan">{{ item.product.artisanName }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ formatPrice(item.unitPrice) }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ formatPrice(item.unitPrice * item.quantity) }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Résumé de la commande -->
+      <div style="max-width: 300px; margin-left: auto; margin-top: 1.5rem;">
+        <div class="summary-row">
+          <span>Sous-total:</span>
+          <span>{{ formatPrice(order.summary.subtotal) }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Frais de livraison:</span>
+          <span>{{ formatPrice(order.summary.shippingCost) }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Taxes:</span>
+          <span>{{ formatPrice(order.summary.tax) }}</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total:</span>
+          <span>{{ formatPrice(order.summary.total) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suivi de livraison -->
+    <div class="order-section" *ngIf="order.trackingInfo">
+      <h2 class="section-title">Suivi de livraison</h2>
+      <div class="tracking-info">
+        <p class="tracking-number">Numéro de suivi: {{ order.trackingInfo.trackingNumber }}</p>
+        <p class="tracking-date">Expédié le: {{ formatDate(order.trackingInfo.shippedDate) }}</p>
+        <p>Transporteur: {{ order.trackingInfo.carrier }}</p>
+        <p *ngIf="order.trackingInfo.estimatedDeliveryDate">
+          Livraison estimée: {{ formatDate(order.trackingInfo.estimatedDeliveryDate) }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Historique des statuts -->
+    <div class="order-section">
+      <h2 class="section-title">Historique de la commande</h2>
+      <div class="timeline">
+        <div class="timeline-item" *ngFor="let update of statusHistory">
+          <div class="timeline-date">{{ formatDateTime(update.timestamp) }}</div>
+          <div class="timeline-status">{{ update.status }}</div>
+          <div class="timeline-comment" *ngIf="update.comment">{{ update.comment }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-buttons">
+      <button class="action-button primary-button" (click)="window.print()">
+        Imprimer la facture
+      </button>
+      <button class="action-button secondary-button" routerLink="/orders">
+        Retour à mes commandes
+      </button>
+      <button *ngIf="canCancel()" class="action-button danger-button" (click)="openCancelDialog()">
+        Annuler la commande
+      </button>
+    </div>
+
+    <!-- Modal d'annulation -->
+    <div *ngIf="showCancelDialog" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Annuler la commande</h3>
+        <p>Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible.</p>
+        <div class="form-group">
+          <label for="cancelReason">Raison de l'annulation:</label>
+          <textarea id="cancelReason" [(ngModel)]="cancelReason" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="action-button secondary-button" (click)="closeCancelDialog()">Annuler</button>
+          <button class="action-button danger-button" [disabled]="!cancelReason.trim() || isCancelling" (click)="cancelOrder()">
+            <span *ngIf="!isCancelling">Confirmer l'annulation</span>
+            <span *ngIf="isCancelling">Traitement en cours...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #notFound>
+    <div class="not-found">
+      <h2>Commande introuvable</h2>
+      <p>Nous n'avons pas pu trouver la commande demandée.</p>
+      <button class="action-button primary-button" routerLink="/orders">Retour à mes commandes</button>
+    </div>
+  </ng-template>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des détails de la commande...</p>
+  </div>
+</ng-template>
+
+<style>
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  .form-group {
+    margin: 1rem 0;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.25rem;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+  
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #3b82f6;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .not-found {
+    text-align: center;
+    padding: 3rem;
+  }
+</style>

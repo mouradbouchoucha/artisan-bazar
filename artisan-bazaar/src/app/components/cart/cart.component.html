@@ -1,0 +1,161 @@
+<!-- Cart Icon Button -->
+<div class="fixed top-20 right-4 z-50">
+  <p-button
+    icon="pi pi-shopping-cart"
+    [badge]="cartSummary.totalItems.toString()"
+    badgeClass="p-badge-danger"
+    styleClass="p-button-rounded p-button-primary p-button-lg"
+    (click)="toggleCart()">
+  </p-button>
+</div>
+
+<!-- Cart Modal -->
+<p-dialog
+  [(visible)]="isVisible"
+  [modal]="true"
+  [style]="{width: '600px'}"
+  [draggable]="false"
+  [resizable]="false"
+  header="Panier d'achat"
+  styleClass="cart-modal">
+
+  <!-- Empty Cart State -->
+  <div *ngIf="cartItems.length === 0" class="text-center py-8">
+    <i class="pi pi-shopping-cart text-6xl text-gray-300 mb-4"></i>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">Votre panier est vide</h3>
+    <p class="text-gray-500 mb-6">Ajoutez des produits pour commencer</p>
+    <p-button
+      label="Continuer les achats"
+      icon="pi pi-arrow-left"
+      styleClass="p-button-outlined"
+      (click)="continueShopping()">
+    </p-button>
+  </div>
+
+  <!-- Cart Items Grouped by Seller -->
+  <div *ngIf="sellerGroups.length > 0" class="space-y-6">
+    <div *ngFor="let group of sellerGroups" class="border border-gray-200 rounded-lg p-4">
+      <!-- Seller Header -->
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+        <div class="flex items-center space-x-2">
+          <i class="pi pi-store text-primary"></i>
+          <h3 class="text-lg font-semibold text-gray-900">{{ group.sellerName }}</h3>
+        </div>
+        <div class="text-right">
+          <p class="text-sm text-gray-600">Sous-total</p>
+          <p class="text-lg font-bold text-primary">{{ formatPrice(group.subtotal) }}</p>
+        </div>
+      </div>
+
+      <!-- Seller Items -->
+      <div class="space-y-3">
+        <div *ngFor="let item of group.items" class="flex items-center space-x-4 p-3 bg-gray-50 rounded-md">
+          <!-- Product Image -->
+          <div class="flex-shrink-0 w-16 h-16">
+            <img [src]="item.product.imageUrl || 'https://picsum.photos/100/100?random=' + item.product.id"
+                 [alt]="item.product.name"
+                 class="w-full h-full object-cover rounded-md">
+          </div>
+
+          <!-- Product Details -->
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-medium text-gray-900 mb-1">{{ item.product.name }}</h4>
+            <p class="text-xs text-gray-500">{{ formatPrice(item.product.price) }} chacun</p>
+
+            <!-- Quantity Controls -->
+            <div class="flex items-center space-x-2 mt-2">
+              <p-button
+                icon="pi pi-minus"
+                styleClass="p-button-text p-button-xs"
+                (click)="updateQuantity(item.product.id, item.quantity - 1)">
+              </p-button>
+
+              <span class="text-xs font-medium w-6 text-center">{{ item.quantity }}</span>
+
+              <p-button
+                icon="pi pi-plus"
+                styleClass="p-button-text p-button-xs"
+                (click)="updateQuantity(item.product.id, item.quantity + 1)">
+              </p-button>
+            </div>
+          </div>
+
+          <!-- Item Total & Remove -->
+          <div class="flex flex-col items-end space-y-1">
+            <span class="text-sm font-bold text-gray-900">{{ formatPrice(getItemTotal(item)) }}</span>
+            <p-button
+              icon="pi pi-trash"
+              styleClass="p-button-text p-button-danger p-button-xs"
+              (click)="removeItem(item.product.id)">
+            </p-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Fee (if applicable) -->
+      <div *ngIf="group.deliveryFee && group.deliveryFee > 0" class="mt-3 pt-3 border-t border-gray-100">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-600">Frais de livraison</span>
+          <span class="font-medium">{{ formatPrice(group.deliveryFee) }}</span>
+        </div>
+      </div>
+
+      <!-- Group Total -->
+      <div class="mt-3 pt-3 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-medium text-gray-700">Total pour {{ group.sellerName }}</span>
+          <span class="text-lg font-bold text-primary">{{ formatPrice(getSellerGroupTotal(group)) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Footer -->
+  <ng-template pTemplate="footer" *ngIf="sellerGroups.length > 0">
+    <!-- Order Summary by Seller -->
+    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+      <h4 class="text-lg font-semibold text-gray-900 mb-3">Résumé de la commande</h4>
+      <div class="space-y-2">
+        <div *ngFor="let group of sellerGroups" class="flex justify-between items-center text-sm">
+          <span class="text-gray-600">{{ group.sellerName }}</span>
+          <span class="font-medium">{{ formatPrice(getSellerGroupTotal(group)) }}</span>
+        </div>
+        <hr class="my-2">
+        <div class="flex justify-between items-center text-base font-semibold">
+          <span class="text-gray-900">Total général</span>
+          <span class="text-primary">{{ formatPrice(cartSummary.totalPrice) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-lg">
+        <span class="font-medium">Articles Total: </span>
+        <span class="font-bold text-primary">{{ cartSummary.totalItems }}</span>
+      </div>
+    </div>
+
+    <div class="flex space-x-3">
+      <p-button
+        label="Vider le panier"
+        icon="pi pi-trash"
+        styleClass="p-button-outlined p-button-danger"
+        (click)="clearCart()">
+      </p-button>
+
+      <p-button
+        label="Continuer les achats"
+        icon="pi pi-arrow-left"
+        styleClass="p-button-outlined"
+        (click)="closeCart()">
+      </p-button>
+
+      <p-button
+        label="Commander"
+        icon="pi pi-shopping-cart"
+        styleClass="p-button-primary"
+        (click)="checkout()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

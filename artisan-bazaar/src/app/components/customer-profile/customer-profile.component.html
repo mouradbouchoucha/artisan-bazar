@@ -1,0 +1,199 @@
+<app-dashboard-layout>
+   <div class="max-w-4xl">
+     <div class="bg-white rounded-lg shadow-sm border">
+       <div class="px-6 py-4 border-b flex justify-between items-center">
+         <h2 class="text-lg font-semibold text-gray-900">Profile Information</h2>
+         <button
+           (click)="toggleEdit()"
+           class="px-4 py-2 text-sm font-medium rounded-md {{ isEditing ? 'bg-gray-500 text-white hover:bg-gray-600' : 'bg-blue-500 text-white hover:bg-blue-600' }}">
+           {{ isEditing ? 'Cancel' : 'Edit Profile' }}
+         </button>
+       </div>
+       <div class="p-6">
+         <div class="flex items-center space-x-6 mb-6">
+           <div class="relative">
+             <div class="h-20 w-20 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+               <img *ngIf="currentUser?.profile_image" [src]="'http://localhost:8000/storage/' + currentUser?.profile_image"
+                    alt="Profile" class="h-full w-full object-cover">
+               <span *ngIf="!currentUser?.profile_image" class="text-gray-600 font-medium text-2xl">
+                 {{ currentUser?.name?.charAt(0) }}
+               </span>
+             </div>
+             <button *ngIf="isEditing" (click)="fileInput.click()"
+                     class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600">
+               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+               </svg>
+             </button>
+           </div>
+           <div>
+             <h3 class="text-xl font-semibold text-gray-900">{{ currentUser?.name }}</h3>
+             <p class="text-gray-600">{{ currentUser?.email }}</p>
+             <p class="text-sm text-gray-500 capitalize">{{ currentUser?.role?.replace('_', ' ') }}</p>
+           </div>
+         </div>
+
+         <!-- View Mode -->
+         <div *ngIf="!isEditing" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div>
+             <h4 class="text-lg font-medium text-gray-900 mb-4">Account Details</h4>
+             <div class="space-y-3">
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Member since</label>
+                 <p class="text-gray-900">{{ getCustomer()?.createdAt | date:'mediumDate' }}</p>
+               </div>
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Total Orders</label>
+                 <p class="text-gray-900">{{ getCustomer()?.totalOrders || 0 }}</p>
+               </div>
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Wishlist Items</label>
+                 <p class="text-gray-900">{{ getCustomer()?.wishlist?.length || 0 }}</p>
+               </div>
+             </div>
+           </div>
+
+           <div>
+             <h4 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h4>
+             <div class="space-y-3">
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Phone</label>
+                 <p class="text-gray-900">{{ currentUser?.phone || 'Not provided' }}</p>
+               </div>
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Address</label>
+                 <p class="text-gray-900">{{ currentUser?.address || 'Not provided' }}</p>
+               </div>
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Date of Birth</label>
+                 <p class="text-gray-900">{{ currentUser?.date_of_birth | date:'mediumDate' || 'Not provided' }}</p>
+               </div>
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Gender</label>
+                 <p class="text-gray-900">{{ currentUser?.gender || 'Not provided' }}</p>
+               </div>
+               <div>
+                 <label class="text-sm font-medium text-gray-600">Bio</label>
+                 <p class="text-gray-900">{{ currentUser?.bio || 'Not provided' }}</p>
+               </div>
+             </div>
+           </div>
+         </div>
+
+         <!-- Edit Mode -->
+         <form *ngIf="isEditing" (ngSubmit)="saveProfile()" class="space-y-6">
+           <!-- Profile Image Upload -->
+           <div class="flex items-center space-x-6 mb-6">
+             <div class="relative">
+               <div class="h-24 w-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center border-2 border-gray-300">
+                 <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview" class="h-full w-full object-cover">
+                 <img *ngIf="!imagePreview && currentUser?.profile_image" [src]="'http://localhost:8000/storage/' + currentUser?.profile_image"
+                      alt="Current" class="h-full w-full object-cover">
+                 <span *ngIf="!imagePreview && !currentUser?.profile_image" class="text-gray-600 font-medium text-3xl">
+                   {{ currentUser?.name?.charAt(0) }}
+                 </span>
+               </div>
+               <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="hidden">
+             </div>
+             <div class="flex-1">
+               <h4 class="text-lg font-medium text-gray-900 mb-2">Profile Photo</h4>
+               <div class="space-y-2">
+                 <button type="button" (click)="fileInput.click()"
+                         class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100">
+                   Choose Image
+                 </button>
+                 <button *ngIf="selectedFile" type="button" (click)="uploadProfileImage()"
+                         [disabled]="isUploadingImage"
+                         class="ml-2 px-4 py-2 text-sm font-medium text-white bg-green-500 border border-transparent rounded-md hover:bg-green-600 disabled:opacity-50">
+                   {{ isUploadingImage ? 'Uploading...' : 'Upload Image' }}
+                 </button>
+                 <button *ngIf="selectedFile" type="button" (click)="removeImagePreview()"
+                         class="ml-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100">
+                   Remove
+                 </button>
+               </div>
+               <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF up to 1MB</p>
+             </div>
+           </div>
+
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div class="space-y-4">
+               <div>
+                 <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                 <input
+                   type="text"
+                   [(ngModel)]="profileForm.name"
+                   name="name"
+                   required
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+               </div>
+               <div>
+                 <label class="block text-sm font-medium text-gray-700">Phone</label>
+                 <input
+                   type="tel"
+                   [(ngModel)]="profileForm.phone"
+                   name="phone"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+               </div>
+               <div>
+                 <label class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                 <input
+                   type="date"
+                   [(ngModel)]="profileForm.date_of_birth"
+                   name="date_of_birth"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+               </div>
+             </div>
+
+             <div class="space-y-4">
+               <div>
+                 <label class="block text-sm font-medium text-gray-700">Address</label>
+                 <textarea
+                   [(ngModel)]="profileForm.address"
+                   name="address"
+                   rows="3"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+               </div>
+               <div>
+                 <label class="block text-sm font-medium text-gray-700">Gender</label>
+                 <select
+                   [(ngModel)]="profileForm.gender"
+                   name="gender"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                   <option value="">Select Gender</option>
+                   <option value="male">Male</option>
+                   <option value="female">Female</option>
+                   <option value="other">Other</option>
+                 </select>
+               </div>
+               <div>
+                 <label class="block text-sm font-medium text-gray-700">Bio</label>
+                 <textarea
+                   [(ngModel)]="profileForm.bio"
+                   name="bio"
+                   rows="3"
+                   placeholder="Tell us about yourself..."
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+               </div>
+             </div>
+           </div>
+
+           <div class="flex justify-end space-x-3">
+             <button
+               type="button"
+               (click)="toggleEdit()"
+               class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+               Cancel
+             </button>
+             <button
+               type="submit"
+               [disabled]="isLoading"
+               class="px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 disabled:opacity-50">
+               {{ isLoading ? 'Saving...' : 'Save Changes' }}
+             </button>
+           </div>
+         </form>
+       </div>
+     </div>
+   </div>
+ </app-dashboard-layout>

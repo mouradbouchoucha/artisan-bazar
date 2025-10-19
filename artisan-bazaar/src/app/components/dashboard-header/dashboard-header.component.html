@@ -1,0 +1,124 @@
+<header class="bg-white shadow-sm border-b">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center">
+        <button class="mr-4 lg:hidden" (click)="toggleSidebar()">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-900">{{ getDashboardTitle() }}</h1>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <!-- Barre de recherche -->
+        <div class="relative hidden md:block">
+          <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input 
+              type="text" 
+              placeholder="Rechercher..." 
+              class="ml-2 outline-none bg-transparent w-48"
+              [(ngModel)]="searchQuery"
+              (keyup.enter)="search()">
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="relative">
+          <button 
+            (click)="toggleNotifications()"
+            class="p-1 rounded-full text-gray-600 hover:text-gray-900 focus:outline-none">
+            <span class="sr-only">Voir les notifications</span>
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span *ngIf="notifications.length > 0" class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+          </button>
+
+          <div 
+            *ngIf="isNotificationsOpen"
+            class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+            <div class="py-1" role="menu">
+              <div class="px-4 py-2 border-b border-gray-200">
+                <h3 class="text-sm font-medium text-gray-900">Notifications</h3>
+              </div>
+              <div *ngIf="notifications.length === 0" class="px-4 py-3 text-sm text-gray-500">
+                Aucune notification
+              </div>
+              <a 
+                *ngFor="let notification of notifications"
+                href="#"
+                class="block px-4 py-3 text-sm hover:bg-gray-100 border-b border-gray-100"
+                role="menuitem">
+                <div class="flex items-start">
+                  <div [ngClass]="notification.read ? 'bg-gray-200' : 'bg-primary'" class="h-2 w-2 rounded-full mt-1.5 mr-2"></div>
+                  <div>
+                    <p class="font-medium text-gray-900">{{ notification.title }}</p>
+                    <p class="text-gray-500">{{ notification.message }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ notification.time }}</p>
+                  </div>
+                </div>
+              </a>
+              <div *ngIf="notifications.length > 0" class="px-4 py-2 text-center">
+                <button (click)="markAllAsRead()" class="text-sm text-primary hover:text-primary-dark">
+                  Marquer tout comme lu
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profil utilisateur -->
+        <div class="relative">
+          <button 
+            (click)="toggleProfileDropdown()"
+            class="flex items-center space-x-3 text-sm focus:outline-none">
+            <div class="text-right hidden sm:block">
+              <p class="font-medium text-gray-900">{{ currentUser?.name }}</p>
+              <p class="text-gray-500 capitalize">{{ currentUser?.role?.replace('_', ' ') }}</p>
+            </div>
+            <div class="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
+              <span class="text-white font-medium text-sm">
+                {{ currentUser?.name?.charAt(0) }}
+              </span>
+            </div>
+          </button>
+
+          <div 
+            *ngIf="isProfileDropdownOpen"
+            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+            <div class="py-1" role="menu">
+              <a 
+                [routerLink]="getProfileLink()" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                role="menuitem">
+                Mon profil
+              </a>
+              <a 
+                [routerLink]="getSettingsLink()" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                role="menuitem">
+                Paramètres
+              </a>
+              <a 
+                routerLink="/" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                role="menuitem">
+                Retour à la boutique
+              </a>
+              <button 
+                (click)="logout()"
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                role="menuitem">
+                Déconnexion
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

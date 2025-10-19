@@ -1,0 +1,139 @@
+<div class="min-h-screen bg-gray-50" *ngIf="!isLoading && product">
+  <!-- Back Button -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <button (click)="goBack()" class="flex items-center text-blue-600 hover:text-blue-800 p-2 rounded-md hover:bg-blue-50 transition-colors" title="Retour aux Produits">
+      <i class="pi pi-arrow-left text-lg"></i>
+    </button>
+  </div>
+
+  <!-- Product Detail -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div class="md:flex">
+        <!-- Product Image -->
+        <div class="md:w-1/2">
+          <div class="aspect-w-1 aspect-h-1">
+            <img [src]="product.imageUrl" [alt]="product.name"
+                 class="w-full h-96 object-cover">
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="md:w-1/2 p-8">
+          <div class="mb-4">
+            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full uppercase font-semibold tracking-wide">
+              {{ product.category }}
+            </span>
+          </div>
+
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product.name }}</h1>
+
+          <div class="flex items-center mb-4" *ngIf="product && product.rating !== undefined">
+            <div class="flex items-center">
+              <div class="flex text-yellow-400">
+                <span *ngFor="let star of [1,2,3,4,5]" class="text-lg">
+                  ★
+                </span>
+              </div>
+              <span class="ml-2 text-gray-600">{{ product.rating.toFixed(1) }} ({{ product.reviewCount }} reviews)</span>
+            </div>
+          </div>
+
+          <div class="text-3xl font-bold text-gray-900 mb-6">
+            {{ formatPrice(product.price) }}
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+            <p class="text-gray-600 leading-relaxed">{{ product.description }}</p>
+          </div>
+
+          <div class="mb-6">
+            <div class="flex items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">Disponibilité:</span>
+              <span class="ml-2" [class]="product.stock > 0 ? 'text-green-600' : 'text-red-600'">
+                {{ product.stock > 0 ? 'En Stock (' + product.stock + ')' : 'Épuisé' }}
+              </span>
+            </div>
+            <div class="flex items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">SKU:</span>
+              <span class="ml-2 text-gray-600">{{ product.sku }}</span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-sm font-medium text-gray-700">Vendeur:</span>
+              <span class="ml-2 text-gray-600">{{ product.sellerName }}</span>
+            </div>
+          </div>
+
+          <div class="flex space-x-4">
+            <button (click)="addToCart(product)"
+                    [disabled]="product.stock === 0"
+                    class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                    title="Ajouter au Panier">
+              <i class="pi pi-shopping-cart text-lg"></i>
+            </button>
+            <button (click)="toggleWishlist(product)"
+                     class="p-3 rounded-md hover:bg-gray-50 transition-all duration-200 transform hover:scale-110 active:scale-150">
+              <i class="text-xl transition-all duration-300 pi"
+                 [ngClass]="isInWishlist(product) ? 'pi-heart-fill text-red-500 animate-pulse' : 'pi-heart text-gray-600'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Similar Products Carousel -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" *ngIf="similarProducts.length > 0">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8">Produits Similaires</h2>
+
+    <p-carousel
+      [value]="similarProducts"
+      [numVisible]="4"
+      [numScroll]="1"
+      [circular]="true"
+      [autoplayInterval]="0"
+      [responsiveOptions]="carouselResponsiveOptions"
+      styleClass="similar-products-carousel">
+      <ng-template let-product pTemplate="item">
+        <div class="p-2">
+          <p-card class="cursor-pointer hover:shadow-lg transition-shadow duration-300 h-full" (click)="goToProduct(product.id)">
+            <ng-template pTemplate="header">
+              <img
+                [alt]="product.name"
+                [src]="product.imageUrl || 'https://picsum.photos/300/200?random=' + product.id"
+                class="w-full h-48 object-cover rounded-t-lg" />
+            </ng-template>
+            <ng-template pTemplate="title">
+              <span class="line-clamp-2">{{ product.name }}</span>
+            </ng-template>
+            <ng-template pTemplate="subtitle">
+              <div class="flex items-center" *ngIf="product && product.rating !== undefined">
+                <div class="flex text-yellow-400 text-sm mr-1">
+                  <span *ngFor="let star of [1,2,3,4,5]">
+                    ★
+                  </span>
+                </div>
+                <span class="text-xs text-gray-600">({{ product.reviewCount }})</span>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="content">
+              <div class="flex justify-between items-center">
+                <span class="text-xl font-bold text-primary">{{ formatPrice(product.price) }}</span>
+                <p-badge [value]="product.category" severity="info" styleClass="text-xs"></p-badge>
+              </div>
+            </ng-template>
+          </p-card>
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+
+  <!-- Loading State -->
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center" *ngIf="isLoading">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Chargement...</p>
+    </div>
+  </div>
+</div>

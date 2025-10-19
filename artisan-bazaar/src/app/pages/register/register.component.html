@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8" [dir]="currentDirection">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Créer un compte
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Ou
+      <a routerLink="/login" class="font-medium text-primary hover:text-primary-dark">
+        Se connecter
+      </a>
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <form class="space-y-6" #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">
+            Nom complet
+          </label>
+          <div class="mt-1">
+            <input id="name" name="name" type="text" autocomplete="name" required [(ngModel)]="userData.name"
+                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Email
+          </label>
+          <div class="mt-1">
+            <input id="email" name="email" type="email" autocomplete="email" required [(ngModel)]="userData.email"
+                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Mot de passe
+          </label>
+          <div class="mt-1">
+            <input id="password" name="password" type="password" autocomplete="new-password" required [(ngModel)]="userData.password"
+                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
+            Confirmer le mot de passe
+          </label>
+          <div class="mt-1">
+            <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required [(ngModel)]="userData.confirmPassword"
+                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Type de compte
+          </label>
+          <div class="flex space-x-4">
+            <label class="flex items-center">
+              <input type="radio" name="role" value="customer" [(ngModel)]="selectedRole" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+              <span class="ml-2 text-sm text-gray-900">Client</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="role" value="seller" [(ngModel)]="selectedRole" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+              <span class="ml-2 text-sm text-gray-900">Vendeur</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <input id="agree-terms" name="agreeTerms" type="checkbox" [(ngModel)]="agreeTerms"
+                 class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+          <label for="agree-terms" class="ml-2 block text-sm text-gray-900">
+            J'accepte les <a href="#" class="text-primary hover:text-primary-dark">termes et conditions</a>
+          </label>
+        </div>
+
+        <div>
+          <button type="submit"
+                  [disabled]="isLoading"
+                  class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="pi pi-spin pi-spinner mr-2" *ngIf="isLoading"></i>
+            {{ isLoading ? 'Création du compte...' : 'Créer un compte' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

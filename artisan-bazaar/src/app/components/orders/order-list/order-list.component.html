@@ -1,0 +1,91 @@
+<div class="orders-container">
+  <div class="orders-header">
+    <h1 class="orders-title">Mes commandes</h1>
+    <div class="filter-container">
+      <select class="filter-select" (change)="onStatusFilterChange($event)">
+        <option value="all">Tous les statuts</option>
+        <option value="pending">En attente</option>
+        <option value="payment_processing">Paiement en cours</option>
+        <option value="paid">Payée</option>
+        <option value="preparing">En préparation</option>
+        <option value="shipped">Expédiée</option>
+        <option value="out_for_delivery">En cours de livraison</option>
+        <option value="delivered">Livrée</option>
+        <option value="cancelled">Annulée</option>
+        <option value="refunded">Remboursée</option>
+        <option value="returned">Retournée</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <svg class="animate-spin h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Chargement des commandes...
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && filteredOrders.length === 0">
+    <svg class="h-12 w-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+    </svg>
+    <h3 class="text-lg font-medium">Aucune commande trouvée</h3>
+    <p class="mt-1">Vous n'avez pas encore de commandes avec ce statut</p>
+  </div>
+
+  <table class="orders-table" *ngIf="!isLoading && filteredOrders.length > 0">
+    <thead>
+      <tr>
+        <th>Commande</th>
+        <th>Date</th>
+        <th>Client</th>
+        <th>Total</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let order of getPaginatedOrders()">
+        <td>{{ order.id }}</td>
+        <td>{{ formatDate(order.orderDate) }}</td>
+        <td>{{ order.customerName }}</td>
+        <td>{{ formatPrice(order.total) }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ order.status }}
+          </span>
+        </td>
+        <td>
+          <a [routerLink]="['/orders', order.id]" class="action-button">
+            Détails
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination" *ngIf="!isLoading && getTotalPages() > 1">
+    <button 
+      class="page-button" 
+      [disabled]="currentPage === 1"
+      (click)="goToPage(currentPage - 1)">
+      &laquo;
+    </button>
+    
+    <button 
+      *ngFor="let page of getPageNumbers()" 
+      class="page-button" 
+      [class.active]="page === currentPage"
+      (click)="goToPage(page)">
+      {{ page }}
+    </button>
+    
+    <button 
+      class="page-button" 
+      [disabled]="currentPage === getTotalPages()"
+      (click)="goToPage(currentPage + 1)">
+      &raquo;
+    </button>
+  </div>
+</div>

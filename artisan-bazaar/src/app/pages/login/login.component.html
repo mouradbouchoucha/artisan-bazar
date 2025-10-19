@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8" [dir]="currentDirection">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Connexion
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      ou
+      <a routerLink="/register" class="font-medium text-primary hover:text-primary-dark">
+        créer un compte
+      </a>
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <p-card class="shadow-lg">
+      <ng-template pTemplate="content">
+        <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
+          <div class="p-fluid">
+            <div class="field">
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                pInputText
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+                ngModel
+                placeholder="votre@email.com">
+            </div>
+
+            <div class="field mt-4">
+              <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                Mot de passe
+              </label>
+              <p-password
+                id="password"
+                name="password"
+                ngModel
+                placeholder="Votre mot de passe"
+                styleClass="w-full"
+                [toggleMask]="true"
+                [feedback]="false">
+              </p-password>
+            </div>
+
+            <div class="field mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Login as</label>
+              <div class="grid grid-cols-3 gap-3">
+                <p-button
+                  type="button"
+                  (click)="selectRole('customer')"
+                  [outlined]="selectedRole !== 'customer'"
+                  label="Client"
+                  styleClass="w-full">
+                </p-button>
+                <p-button
+                  type="button"
+                  (click)="selectRole('seller')"
+                  [outlined]="selectedRole !== 'seller'"
+                  label="Vendeur"
+                  styleClass="w-full">
+                </p-button>
+                <p-button
+                  type="button"
+                  (click)="selectRole('super_admin')"
+                  [outlined]="selectedRole !== 'super_admin'"
+                  label="Administrateur"
+                  styleClass="w-full">
+                </p-button>
+              </div>
+            </div>
+
+            <div class="field mt-4">
+              <p-button
+                type="submit"
+                label="Se connecter"
+                styleClass="w-full p-button-lg"
+                [loading]="false">
+              </p-button>
+            </div>
+          </div>
+        </form>
+      </ng-template>
+    </p-card>
+  </div>
+</div>

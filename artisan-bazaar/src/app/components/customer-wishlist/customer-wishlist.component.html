@@ -1,0 +1,84 @@
+<app-dashboard-layout>
+  <div class="max-w-7xl">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Liste de souhaits</h1>
+      <p class="text-gray-600">Vos articles sauvegardés</p>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border mb-8">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="p-3 bg-red-100 rounded-lg">
+            <i class="pi pi-heart text-red-600 text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Nombre d'articles</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ wishlistItems.length }}</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-sm font-medium text-gray-600">Valeur totale</p>
+          <p class="text-2xl font-semibold text-gray-900">${{ getTotalValue() | number:'1.0-2' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wishlist Items -->
+    <div *ngIf="wishlistItems.length > 0; else emptyWishlist" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div *ngFor="let wishlistItem of wishlistItems" class="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div class="aspect-w-1 aspect-h-1">
+          <img
+            [src]="wishlistItem.product.imageUrl || 'https://picsum.photos/300/200?random=' + wishlistItem.product.id"
+            [alt]="wishlistItem.product.name"
+            class="w-full h-48 object-cover">
+        </div>
+
+        <div class="p-4">
+          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ wishlistItem.product.name }}</h3>
+          <p class="text-sm text-gray-500 mb-3">{{ wishlistItem.product.description | slice:0:80 }}...</p>
+
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-lg font-bold text-primary">{{ formatPrice(wishlistItem.product.price) }}</span>
+            <span class="text-sm text-gray-500">{{ wishlistItem.product.category }}</span>
+          </div>
+
+          <div class="flex space-x-2">
+            <button
+              (click)="addToCart(wishlistItem.product)"
+              class="flex-1 bg-primary text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
+              Ajouter au panier
+            </button>
+            <button
+              (click)="moveToCart(wishlistItem.product)"
+              class="flex-1 bg-green-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">
+              Déplacer vers le panier
+            </button>
+          </div>
+
+          <button
+            (click)="removeFromWishlist(wishlistItem.product)"
+            class="w-full mt-2 text-red-600 hover:text-red-800 text-sm font-medium">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Wishlist -->
+    <ng-template #emptyWishlist>
+      <div class="text-center py-12">
+        <i class="pi pi-heart mx-auto text-gray-400 text-5xl"></i>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">Votre liste de souhaits est vide</h3>
+        <p class="mt-1 text-sm text-gray-500">Ajoutez des produits à votre liste de souhaits pour les retrouver plus tard.</p>
+        <div class="mt-6">
+          <a
+            routerLink="/products"
+            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark">
+            Parcourir les produits
+          </a>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</app-dashboard-layout>

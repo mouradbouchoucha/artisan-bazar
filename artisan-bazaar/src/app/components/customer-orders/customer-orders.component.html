@@ -1,0 +1,68 @@
+<app-dashboard-layout>
+  <div class="max-w-7xl">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">My Orders</h1>
+      <p class="text-gray-600">Track and manage your orders</p>
+    </div>
+
+    <!-- Orders List -->
+    <div class="bg-white rounded-lg shadow-sm border">
+      <div class="px-6 py-4 border-b">
+        <h2 class="text-lg font-semibold text-gray-900">Order History</h2>
+      </div>
+      <div class="divide-y divide-gray-200">
+        <div *ngFor="let order of orders" class="p-6 hover:bg-gray-50 transition-colors">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-medium text-gray-900">{{ order.orderNumber }}</h3>
+                <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                      [class]="getStatusColor(order.status)">
+                  {{ order.status | titlecase }}
+                </span>
+              </div>
+              <div class="text-sm text-gray-600 mb-2">
+                <p>Ordered on {{ order.date | date:'mediumDate' }}</p>
+                <p>{{ order.items }} item(s) • Total: ${{ order.total }}</p>
+                <p *ngIf="order.trackingNumber" class="text-blue-600">
+                  Tracking: {{ order.trackingNumber }}
+                </p>
+              </div>
+            </div>
+            <div class="flex space-x-2 ml-4">
+              <button *ngIf="order.trackingNumber" 
+                      (click)="trackOrder(order)"
+                      class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                Track
+              </button>
+              <button *ngIf="order.status === 'pending' || order.status === 'processing'" 
+                      (click)="cancelOrder(order)"
+                      class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
+                Cancel
+              </button>
+              <button *ngIf="order.status === 'delivered'" 
+                      (click)="reorder(order)"
+                      class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                Reorder
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="orders.length === 0" class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No orders yet</h3>
+      <p class="mt-1 text-sm text-gray-500">Start shopping to see your orders here.</p>
+      <div class="mt-6">
+        <a routerLink="/products" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark">
+          Start Shopping
+        </a>
+      </div>
+    </div>
+  </div>
+</app-dashboard-layout>

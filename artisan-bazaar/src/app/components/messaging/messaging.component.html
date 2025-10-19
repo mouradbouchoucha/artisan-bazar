@@ -1,0 +1,19 @@
+<div class="messaging-header">
+  <h1 class="messaging-title">Messagerie</h1>
+</div>
+
+<div class="messaging-container">
+  <div class="sidebar">
+    <app-conversation-list
+      [conversations]="conversations"
+      [selectedConversationId]="selectedConversationId"
+      (conversationSelected)="onConversationSelected($event)">
+    </app-conversation-list>
+  </div>
+  
+  <div class="main-content">
+    <app-conversation
+      [conversationId]="selectedConversationId">
+    </app-conversation>
+  </div>
+</div>

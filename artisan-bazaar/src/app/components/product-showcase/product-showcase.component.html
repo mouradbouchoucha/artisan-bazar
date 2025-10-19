@@ -1,0 +1,60 @@
+<div class="bg-gray-50 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="lg:text-center mb-10">
+      <h2 class="text-base text-primary font-semibold tracking-wide uppercase">PRODUITS EN VEDETTE</h2>
+      <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+        Créations Artisanales Sélectionnées
+      </p>
+    </div>
+
+    <p-carousel
+      [value]="featuredProducts"
+      [numVisible]="4"
+      [numScroll]="1"
+      [circular]="true"
+      [autoplayInterval]="5000"
+      [responsiveOptions]="responsiveOptions"
+      styleClass="custom-carousel">
+      <ng-template let-product pTemplate="item">
+        <div class="p-2">
+          <p-card class="cursor-pointer hover:shadow-lg transition-shadow duration-300 h-full" (click)="goToProduct(product.id)">
+            <ng-template pTemplate="header">
+              <img
+                [alt]="product.name"
+                [src]="product.imageUrl || 'https://picsum.photos/300/200?random=' + product.id"
+                class="w-full h-48 object-cover rounded-t-lg" />
+            </ng-template>
+            <ng-template pTemplate="title">
+              {{ product.name }}
+            </ng-template>
+            <ng-template pTemplate="subtitle">
+              {{ product.description }}
+            </ng-template>
+            <ng-template pTemplate="content">
+              <div class="flex justify-between items-center mt-4">
+                <span class="text-2xl font-bold text-primary">{{ formatPrice(product.price) }}</span>
+                <button
+                  class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105"
+                  (click)="addToCart(product); $event.stopPropagation()">
+                  <i class="pi pi-shopping-cart"></i>
+                  <span class="hidden sm:inline">Ajouter au Panier</span>
+                  <span class="sm:hidden">Ajouter</span>
+                </button>
+              </div>
+            </ng-template>
+          </p-card>
+        </div>
+      </ng-template>
+    </p-carousel>
+
+    <div class="mt-12 text-center">
+      <p-button
+        label="Voir Tous les Produits"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        routerLink="/products"
+        styleClass="p-button-lg">
+      </p-button>
+    </div>
+  </div>
+</div>

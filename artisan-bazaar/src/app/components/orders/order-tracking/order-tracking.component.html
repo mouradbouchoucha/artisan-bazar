@@ -1,0 +1,115 @@
+<div class="tracking-container" *ngIf="!isLoading; else loadingTemplate">
+  <div *ngIf="!error; else errorTemplate">
+    <div class="tracking-header">
+      <h2 class="tracking-title">Suivi de livraison</h2>
+      <span class="tracking-number" *ngIf="order?.trackingInfo">
+        N° de suivi: {{ order?.trackingInfo?.trackingNumber }}
+      </span>
+    </div>
+
+    <div class="tracking-info" *ngIf="order?.trackingInfo">
+      <div>
+        <div class="tracking-info-label">Transporteur</div>
+        <div class="tracking-info-value">{{ order?.trackingInfo?.carrier }}</div>
+      </div>
+      <div>
+        <div class="tracking-info-label">Date d'expédition</div>
+        <div class="tracking-info-value">{{ formatDate(order?.trackingInfo?.shippedDate) }}</div>
+      </div>
+      <div *ngIf="order?.trackingInfo?.estimatedDeliveryDate">
+        <div class="tracking-info-label">Livraison estimée</div>
+        <div class="tracking-info-value">{{ formatDate(order?.trackingInfo?.estimatedDeliveryDate) }}</div>
+      </div>
+    </div>
+
+    <div class="tracking-steps">
+      <div class="tracking-step" *ngFor="let step of trackingSteps; let last = last">
+        <div class="step-indicator" [ngClass]="step.status">
+          <svg *ngIf="step.icon === 'check'" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <svg *ngIf="step.icon === 'credit-card'" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+          </svg>
+          <svg *ngIf="step.icon === 'package'" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+          </svg>
+          <svg *ngIf="step.icon === 'truck'" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+          </svg>
+          <svg *ngIf="step.icon === 'map-pin'" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <svg *ngIf="step.icon === 'home'" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <svg *ngIf="step.icon === 'x'" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+        <div class="step-line" *ngIf="!last"></div>
+        <div class="step-content">
+          <div class="step-title">{{ step.title }}</div>
+          <div class="step-date">{{ formatDate(step.date) }}</div>
+          <div class="step-description">{{ step.description }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-container" *ngIf="order?.trackingInfo && order?.status === 'SHIPPED' || order?.status === 'OUT_FOR_DELIVERY'">
+      <div>Carte de suivi en temps réel (Fonctionnalité à venir)</div>
+    </div>
+  </div>
+
+  <ng-template #errorTemplate>
+    <div class="error-message">
+      <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+      <p>{{ error }}</p>
+    </div>
+  </ng-template>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des informations de suivi...</p>
+  </div>
+</ng-template>
+
+<style>
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: #fee2e2;
+    border-radius: 0.375rem;
+    color: #b91c1c;
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  
+  .spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border-left-color: #3b82f6;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>

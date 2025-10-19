@@ -1,0 +1,91 @@
+<div class="filters-container" [class.open]="isMobileFiltersOpen">
+  <div class="mobile-filter-header" *ngIf="isMobileFiltersOpen">
+    <h3>Filtres</h3>
+    <button class="mobile-filter-close" (click)="toggleMobileFilters()">&times;</button>
+  </div>
+
+  <div *ngFor="let group of filterGroups" class="filter-group">
+    <div class="filter-title">
+      <span>{{ group.name }}</span>
+    </div>
+    
+    <div class="filter-content">
+      <!-- Filtres de type checkbox (catégories, tags) -->
+      <ng-container *ngIf="group.type === 'checkbox' && group.options">
+        <div *ngFor="let option of group.options" class="filter-option">
+          <input 
+            type="checkbox" 
+            [id]="option.id" 
+            [checked]="group.name === 'Catégories' ? isCategorySelected(option.id) : isTagSelected(option.id)"
+            (change)="group.name === 'Catégories' ? toggleCategory(option.id) : toggleTag(option.id)">
+          <label [for]="option.id">
+            {{ option.name }}
+            <span class="filter-count" *ngIf="option.count">({{ option.count }})</span>
+          </label>
+        </div>
+      </ng-container>
+      
+      <!-- Filtre de fourchette de prix -->
+      <ng-container *ngIf="group.type === 'range'">
+        <div class="price-range">
+          <div class="price-inputs">
+            <input 
+              type="number" 
+              class="price-input" 
+              [formControl]="filterForm.get('priceMin')" 
+              min="0">
+            <span>à</span>
+            <input 
+              type="number" 
+              class="price-input" 
+              [formControl]="filterForm.get('priceMax')" 
+              min="0">
+          </div>
+          <input 
+            type="range" 
+            class="price-slider" 
+            [min]="group.rangeMin" 
+            [max]="group.rangeMax" 
+            [formControl]="filterForm.get('priceMax')">
+        </div>
+      </ng-container>
+      
+      <!-- Filtre d'étoiles (note) -->
+      <ng-container *ngIf="group.type === 'star'">
+        <div *ngFor="let option of group.options" class="filter-option">
+          <div class="star-rating" (click)="setRating(option.id)">
+            <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
+              <span class="star" [class.filled]="star <= option.id">★</span>
+            </ng-container>
+            <label class="ml-2">
+              {{ option.name }}
+              <span class="filter-count" *ngIf="option.count">({{ option.count }})</span>
+            </label>
+          </div>
+        </div>
+      </ng-container>
+      
+      <!-- Filtre radio (disponibilité) -->
+      <ng-container *ngIf="group.type === 'radio' && group.options">
+        <div *ngFor="let option of group.options" class="filter-option">
+          <input 
+            type="radio" 
+            [id]="option.id" 
+            name="availability" 
+            [checked]="option.id === 'inStock' ? filterForm.get('inStock')?.value : !filterForm.get('inStock')?.value"
+            (change)="setAvailability(option.id === 'inStock')">
+          <label [for]="option.id">{{ option.name }}</label>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  
+  <button class="clear-filters" (click)="clearFilters()">Effacer les filtres</button>
+</div>
+
+<button class="mobile-filter-toggle" (click)="toggleMobileFilters()">
+  <svg class="h-4 w-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+  </svg>
+  Filtres
+</button>

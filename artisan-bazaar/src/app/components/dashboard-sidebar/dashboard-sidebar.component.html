@@ -1,0 +1,67 @@
+<aside class="w-64 bg-white shadow-sm min-h-screen">
+  <!-- Logo et nom du site -->
+  <div class="p-4 border-b border-gray-200">
+    <a routerLink="/" class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+      <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">AB</div>
+      <span class="ml-3 text-lg font-semibold text-gray-800">Artisan Bazaar</span>
+    </a>
+  </div>
+
+  <!-- Menu principal -->
+  <nav class="mt-6">
+    <div class="px-4 mb-6">
+      <h3 class="text-xs uppercase font-semibold text-gray-500 tracking-wider">Menu principal</h3>
+      <div class="mt-3 space-y-1">
+        <a 
+          *ngFor="let item of mainMenuItems"
+          [routerLink]="item.route"
+          routerLinkActive="bg-primary text-white"
+          class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors group">
+          <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath(item.icon)"></path>
+          </svg>
+          <span class="font-medium">{{ item.label }}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Gestion des produits -->
+    <div class="px-4 mb-6">
+      <h3 class="text-xs uppercase font-semibold text-gray-500 tracking-wider">Gestion des produits</h3>
+      <div class="mt-3 space-y-1">
+        <a 
+          *ngFor="let item of productMenuItems"
+          [routerLink]="item.route"
+          routerLinkActive="bg-primary text-white"
+          class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors group">
+          <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath(item.icon)"></path>
+          </svg>
+          <span class="font-medium">{{ item.label }}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Paramètres -->
+    <div class="px-4 mt-auto">
+      <h3 class="text-xs uppercase font-semibold text-gray-500 tracking-wider">Paramètres</h3>
+      <div class="mt-3 space-y-1">
+        <a 
+          *ngFor="let item of settingsMenuItems"
+          [routerLink]="item.route"
+          routerLinkActive="bg-primary text-white"
+          class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors group">
+          <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath(item.icon)"></path>
+          </svg>
+          <span class="font-medium">{{ item.label }}</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Version -->
+  <div class="px-4 py-2 mt-6 border-t border-gray-200">
+    <p class="text-xs text-gray-500">Artisan Bazaar v1.0.0</p>
+  </div>
+</aside>

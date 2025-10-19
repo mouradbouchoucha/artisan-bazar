@@ -1,0 +1,101 @@
+<div class="search-container">
+  <div class="search-header">
+    <h1 class="search-title">Recherche avancée</h1>
+    <p class="search-description">Trouvez des produits artisanaux uniques avec nos filtres de recherche avancés</p>
+  </div>
+
+  <div class="search-bar">
+    <input 
+      type="text" 
+      class="search-input" 
+      [formControl]="searchQuery" 
+      placeholder="Rechercher des produits artisanaux...">
+    <button class="search-button" (click)="performSearch()">
+      <svg class="h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      Rechercher
+    </button>
+  </div>
+
+  <div class="search-content">
+    <div class="filters-sidebar">
+      <app-search-filters 
+        [availableFilters]="availableFilters" 
+        (filtersChanged)="onFiltersChanged($event)">
+      </app-search-filters>
+    </div>
+
+    <div class="results-container">
+      <div class="results-header" *ngIf="searchResults && !isLoading">
+        <div class="results-count">
+          {{ searchResults.totalCount }} produit(s) trouvé(s)
+        </div>
+        <div class="sort-options">
+          <select class="sort-select" (change)="onSortChange($event)">
+            <option value="newest">Plus récents</option>
+            <option value="price_asc">Prix croissant</option>
+            <option value="price_desc">Prix décroissant</option>
+            <option value="rating">Mieux notés</option>
+            <option value="popularity">Popularité</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">
+        <svg class="animate-spin h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Chargement des résultats...
+      </div>
+
+      <div class="no-results" *ngIf="searchResults && searchResults.products.length === 0 && !isLoading">
+        <svg class="h-12 w-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="text-lg font-medium">Aucun produit trouvé</h3>
+        <p class="mt-1">Essayez de modifier vos filtres ou votre recherche</p>
+      </div>
+
+      <div class="products-grid" *ngIf="searchResults && searchResults.products.length > 0 && !isLoading">
+        <div class="product-card" *ngFor="let product of searchResults.products" (click)="goToProduct(product.id)">
+          <img [src]="product.imageUrl" [alt]="product.name" class="product-image">
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <div class="product-price">{{ formatPrice(product.price) }}</div>
+            <div class="product-rating">
+              <span class="rating-stars">{{ getRatingStars(product.rating) }}</span>
+              <span>{{ product.rating.toFixed(1) }}</span>
+            </div>
+            <div class="product-artisan">par {{ product.artisanName || product.sellerName }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination" *ngIf="searchResults && searchResults.totalCount > pageSize && !isLoading">
+        <button 
+          class="page-button" 
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)">
+          &laquo;
+        </button>
+        
+        <button 
+          *ngFor="let page of getPageNumbers()" 
+          class="page-button" 
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+        
+        <button 
+          class="page-button" 
+          [disabled]="currentPage === getPageNumbers().length"
+          (click)="goToPage(currentPage + 1)">
+          &raquo;
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

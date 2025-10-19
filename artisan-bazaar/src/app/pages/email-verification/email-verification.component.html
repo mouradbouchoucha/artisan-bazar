@@ -1,0 +1,55 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div class="text-center">
+
+        <!-- Loading State -->
+        <div *ngIf="verificationStatus === 'loading'" class="animate-pulse">
+          <div class="mx-auto h-12 w-12 bg-blue-500 rounded-full mb-4"></div>
+          <h2 class="text-xl font-semibold text-gray-900 mb-2">Verifying Email</h2>
+          <p class="text-gray-600">Please wait while we verify your email address...</p>
+        </div>
+
+        <!-- Success State -->
+        <div *ngIf="verificationStatus === 'success'" class="text-green-600">
+          <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h2 class="text-xl font-semibold mb-2">Email Verified!</h2>
+          <p class="mb-4">{{ message }}</p>
+          <p class="text-sm text-gray-600">Redirecting to login page...</p>
+        </div>
+
+        <!-- Already Verified State -->
+        <div *ngIf="verificationStatus === 'already-verified'" class="text-blue-600">
+          <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h2 class="text-xl font-semibold mb-2">Already Verified</h2>
+          <p class="mb-4">{{ message }}</p>
+          <button (click)="router.navigate(['/login'])" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Go to Login
+          </button>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="verificationStatus === 'error'" class="text-red-600">
+          <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+          <h2 class="text-xl font-semibold mb-2">Verification Failed</h2>
+          <p class="mb-4">{{ message }}</p>
+          <div class="space-y-2">
+            <button (click)="router.navigate(['/login'])" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">
+              Go to Login
+            </button>
+            <button (click)="router.navigate(['/register'])" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+              Register Again
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

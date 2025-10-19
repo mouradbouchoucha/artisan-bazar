@@ -1,0 +1,46 @@
+<div class="conversation-list">
+  <div class="search-box">
+    <input 
+      type="text" 
+      class="search-input" 
+      placeholder="Rechercher une conversation..." 
+      [(ngModel)]="searchQuery"
+      (input)="searchConversations()">
+  </div>
+  
+  <div *ngIf="filteredConversations.length === 0" class="empty-state">
+    Aucune conversation trouvée
+  </div>
+  
+  <div 
+    *ngFor="let conversation of filteredConversations" 
+    class="conversation-item" 
+    [class.active]="conversation.id === selectedConversationId"
+    (click)="selectConversation(conversation.id)">
+    
+    <div class="conversation-header">
+      <div class="conversation-name">
+        {{ getOtherPartyName(conversation) }}
+        <span *ngIf="conversation.unreadCount > 0" class="unread-badge">
+          {{ conversation.unreadCount }}
+        </span>
+      </div>
+      <div class="conversation-time">
+        {{ formatTimestamp(conversation.lastMessageTimestamp) }}
+      </div>
+    </div>
+    
+    <div *ngIf="conversation.productName" class="conversation-product">
+      <img 
+        *ngIf="conversation.productImage" 
+        [src]="conversation.productImage" 
+        alt="Product" 
+        class="product-image">
+      <div class="product-name">{{ conversation.productName }}</div>
+    </div>
+    
+    <div class="conversation-preview">
+      {{ conversation.lastMessage }}
+    </div>
+  </div>
+</div>

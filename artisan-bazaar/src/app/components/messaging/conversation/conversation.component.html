@@ -1,0 +1,47 @@
+<div class="conversation-container" *ngIf="conversation; else emptyState">
+  <div class="conversation-header">
+    <h3 class="conversation-title">{{ getOtherPartyName() }}</h3>
+    <div class="conversation-status" *ngIf="conversation.productName">
+      À propos de: {{ conversation.productName }}
+    </div>
+  </div>
+
+  <div class="messages-container" #messagesContainer>
+    <ng-container *ngFor="let message of messages; let i = index">
+      <!-- Date separator -->
+      <div class="date-separator" *ngIf="shouldShowDateSeparator(message, i)">
+        <span class="date-text">{{ formatDateSeparator(message.timestamp) }}</span>
+      </div>
+      
+      <!-- Message -->
+      <div class="message" 
+           [class.message-sent]="isCurrentUser(message.senderId)" 
+           [class.message-received]="!isCurrentUser(message.senderId)">
+        <div class="message-content">{{ message.content }}</div>
+        <div class="message-time">{{ formatTimestamp(message.timestamp) }}</div>
+      </div>
+    </ng-container>
+  </div>
+
+  <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="message-form">
+    <textarea 
+      class="message-input" 
+      formControlName="content" 
+      placeholder="Écrivez votre message..." 
+      rows="2"></textarea>
+    <button 
+      type="submit" 
+      class="send-button" 
+      [disabled]="messageForm.invalid || isSubmitting">
+      Envoyer
+    </button>
+  </form>
+</div>
+
+<ng-template #emptyState>
+  <div class="empty-state" *ngIf="!conversationId">
+    <div class="empty-icon">💬</div>
+    <h3>Sélectionnez une conversation</h3>
+    <p>Choisissez une conversation dans la liste pour commencer à discuter</p>
+  </div>
+</ng-template>
